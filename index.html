@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProWrite - PT-VEN2304</title>
+    <!-- 改用 dom-to-image 庫，解決跨域及本地保存報錯問題 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+HK:wght@400;700&display=swap');
+
+        :root {
+            --primary: #6C5CE7;
+            --primary-hover: #5A4FCF;
+            --secondary: #00CEC9;
+            --bg-gradient: linear-gradient(135deg, #74EBD5 0%, #9FACE6 100%);
+            --card-bg: #FFFFFF;
+            --text-main: #2D3436;
+            --text-light: #636E72;
+            --blank-bg: #FFEAA7;
+            --blank-text: #D63031;
+        }
+
+        * { box-sizing: border-box; font-family: 'Poppins', 'Noto Sans HK', sans-serif; }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-attachment: fixed;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 850px;
+            background: var(--card-bg);
+            min-height: 85vh;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page {
+            display: none;
+            padding: 40px 50px;
+            flex-grow: 1;
+            animation: fadeIn 0.4s ease-in-out;
+            flex-direction: column;
+        }
+        .page.active { display: flex; }
+
+        @media (max-width: 768px) {
+            .page { padding: 30px 20px; }
+            .app-container { min-height: 90vh; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Landing Page 排版 */
+        .landing-header { text-align: center; margin-top: 10px; }
+        .course-code { background: var(--secondary); color: white; padding: 8px 24px; border-radius: 30px; font-size: 18px; font-weight: 700; display: inline-block; margin-bottom: 25px; letter-spacing: 1px; }
+        .course-title { font-size: 22px; color: var(--text-light); margin-bottom: 10px; font-weight: 600; }
+        .assessment-title { font-size: 42px; font-weight: 800; color: var(--text-main); margin-bottom: 30px; line-height: 1.2; text-shadow: 1px 1px 2px rgba(0,0,0,0.05); }
+        
+        /* Features 區塊 */
+        .features-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+        .feature-box {
+            background: #F8F9FA;
+            border: 2px solid #F1F2F6;
+            border-radius: 16px;
+            padding: 20px;
+            width: 200px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .feature-box:hover {
+            transform: translateY(-5px);
+            border-color: #A29BFE;
+            background: #F8F7FF;
+        }
+        .feature-icon { font-size: 36px; margin-bottom: 10px; }
+        .feature-text { font-size: 15px; color: var(--text-light); font-weight: 600; }
+
+        .platform-logo { font-size: 60px; margin-bottom: 5px; animation: bounce 2s infinite; display: inline-block; }
+        .platform-name { font-size: 24px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-15px);}
+            60% {transform: translateY(-8px);}
+        }
+
+        .btn {
+            background: var(--primary); color: white; border: none; padding: 18px; width: 100%; border-radius: 14px; font-size: 20px; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: auto; box-shadow: 0 6px 20px rgba(108, 92, 231, 0.4);
+        }
+        .btn:hover { background: var(--primary-hover); transform: translateY(-3px); box-shadow: 0 8px 25px rgba(108, 92, 231, 0.5); }
+        .btn:disabled { background: #DFE6E9; cursor: not-allowed; box-shadow: none; transform: none; color: #B2BEC3; }
+        .btn-outline { background: transparent; color: var(--text-light); border: 2px solid #DFE6E9; box-shadow: none; }
+        .btn-outline:hover { background: #F5F6FA; color: var(--text-main); border-color: #B2BEC3; }
+        
+        .progress-container { width: 100%; background: #F1F2F6; height: 10px; border-radius: 5px; margin-bottom: 30px; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--secondary), var(--primary)); border-radius: 5px; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); width: 0%; }
+
+        .step-title { font-size: 26px; font-weight: 800; margin-bottom: 25px; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
+        .step-desc { font-size: 16px; color: var(--text-light); font-weight: 400; margin-left: auto; }
+        
+        .option-card {
+            border: 2px solid #F1F2F6; background: #FFFFFF; border-radius: 16px; padding: 22px; padding-right: 50px; margin-bottom: 18px; cursor: pointer; transition: all 0.2s; position: relative; font-size: 17px; line-height: 1.7; color: #4A4A4A;
+        }
+        .option-card:hover { border-color: #A29BFE; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .option-card.selected { border-color: var(--primary); background: #F8F7FF; box-shadow: 0 8px 20px rgba(108, 92, 231, 0.12); color: var(--text-main); }
+        .option-card.selected::after { content: '✅'; position: absolute; top: 22px; right: 15px; font-size: 22px; }
+        
+        .blank-text { color: var(--blank-text); font-weight: 700; background: var(--blank-bg); padding: 2px 8px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+        .email-display {
+            background: #FFFFFF; border: 2px solid #E9ECEF; padding: 40px; border-radius: 12px; white-space: pre-wrap; font-size: 16px; line-height: 1.9; margin-bottom: 25px; color: var(--text-main);
+        }
+        
+        /* 確保截圖區域白底，並加入一個微微嘅 padding 令圖片出黎靚啲 */
+        #capture-area { background: white; border-radius: 12px; padding: 5px; }
+
+        .nav-buttons { display: flex; gap: 15px; margin-top: 30px; }
+        .nav-buttons .btn { margin-top: 0; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    
+    <!-- Landing Page -->
+    <div id="landing" class="page active">
+        <div class="landing-header">
+            <div class="course-code">📝 PT-VEN2304</div>
+            <div class="course-title">Vocational English 2D: Workplace Writing II</div>
+            <div class="assessment-title">Integrated Assessment</div>
+            
+            <div class="platform-logo">✨</div>
+            <div class="platform-name">ProWrite Template Builder</div>
+        </div>
+
+        <div class="features-container">
+            <div class="feature-box">
+                <div class="feature-icon">🎯</div>
+                <div class="feature-text">Step-by-Step<br>輕鬆揀句子</div>
+            </div>
+            <div class="feature-box">
+                <div class="feature-icon">💡</div>
+                <div class="feature-text">Grammar Hints<br>提示寫作要求</div>
+            </div>
+            <div class="feature-box">
+                <div class="feature-icon">📸</div>
+                <div class="feature-text">Save & Copy<br>一鍵儲存圖文</div>
+            </div>
+        </div>
+
+        <div style="flex-grow: 1;"></div>
+        <button class="btn" onclick="goToStep(1)">Start Building 🚀</button>
+    </div>
+
+    <!-- Step 1 -->
+    <div id="step1" class="page">
+        <div class="progress-container"><div class="progress-bar" style="width: 15%;"></div></div>
+        <div class="step-title">👋 Step 1: Opening & Purpose<span class="step-desc">開場白</span></div>
+        
+        <div class="option-card" onclick="selectOption(1, this, 'As you know, [描述現有問題 - Complete sentence]. [提供數據或原因 - Complete sentence]. I am writing to share the proposed solutions and our recommended way forward.')">
+            As you know, <span class="blank-text">[描述現有問題 - Complete sentence]</span>. <span class="blank-text">[提供數據或原因 - Complete sentence]</span>. I am writing to share the proposed solutions and our recommended way forward.
+        </div>
+        <div class="option-card" onclick="selectOption(1, this, 'As you are aware, [描述現有問題 - Complete sentence]. [提供背景或數據 - Complete sentence]. I am writing to present the proposed solutions and our suggested way forward.')">
+            As you are aware, <span class="blank-text">[描述現有問題 - Complete sentence]</span>. <span class="blank-text">[提供背景或數據 - Complete sentence]</span>. I am writing to present the proposed solutions and our suggested way forward.
+        </div>
+        <div class="option-card" onclick="selectOption(1, this, 'As mentioned previously, [描述現有問題 - Complete sentence]. [提供數據或影響 - Complete sentence]. I am writing to explain the proposed solutions and to recommend the most appropriate option.')">
+            As mentioned previously, <span class="blank-text">[描述現有問題 - Complete sentence]</span>. <span class="blank-text">[提供數據或影響 - Complete sentence]</span>. I am writing to explain the proposed solutions and to recommend the most appropriate option.
+        </div>
+
+        <div style="flex-grow: 1;"></div>
+        <div class="nav-buttons">
+            <button class="btn btn-outline" style="width: 35%;" onclick="goToStep(0)">⬅️ Back</button>
+            <button class="btn" id="btn-next-1" disabled onclick="goToStep(2)">Next ➡️</button>
+        </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div id="step2" class="page">
+        <div class="progress-container"><div class="progress-bar" style="width: 30%;"></div></div>
+        <div class="step-title">💡 Step 2: Proposing Solutions<span class="step-desc">三個方案</span></div>
+        
+        <div class="option-card" onclick="selectOption(2, this, 'To address this issue, our department has developed three possible options. First, we could [方案一 - Verb-base]. Second, we may consider [方案二 - Verb-ing / Noun phrase]. Lastly, [方案三 - Noun phrase] could also be a workable solution.')">
+            To address this issue, our department has developed three possible options. First, we could <span class="blank-text">[方案一 - Verb-base]</span>. Second, we may consider <span class="blank-text">[方案二 - Verb-ing / Noun phrase]</span>. Lastly, <span class="blank-text">[方案三 - Noun phrase]</span> could also be a workable solution.
+        </div>
+        <div class="option-card" onclick="selectOption(2, this, 'To solve this issue, our department has identified three possible solutions. First, we could [方案一 - Verb-base]. Second, we may consider [方案二 - Verb-ing / Noun phrase]. Lastly, [方案三 - Noun phrase] could also be an effective option.')">
+            To solve this issue, our department has identified three possible solutions. First, we could <span class="blank-text">[方案一 - Verb-base]</span>. Second, we may consider <span class="blank-text">[方案二 - Verb-ing / Noun phrase]</span>. Lastly, <span class="blank-text">[方案三 - Noun phrase]</span> could also be an effective option.
+        </div>
+        <div class="option-card" onclick="selectOption(2, this, 'To deal with this matter, our department has proposed three possible options. First, we could [方案一 - Verb-base]. Second, we may consider [方案二 - Verb-ing / Noun phrase]. Lastly, [方案三 - Noun phrase] could also be considered.')">
+            To deal with this matter, our department has proposed three possible options. First, we could <span class="blank-text">[方案一 - Verb-base]</span>. Second, we may consider <span class="blank-text">[方案二 - Verb-ing / Noun phrase]</span>. Lastly, <span class="blank-text">[方案三 - Noun phrase]</span> could also be considered.
+        </div>
+
+        <div style="flex-grow: 1;"></div>
+        <div class="nav-buttons">
+            <button class="btn btn-outline" style="width: 35%;" onclick="goToStep(1)">⬅️ Back</button>
+            <button class="btn" id="btn-next-2" disabled onclick="goToStep(3)">Next ➡️</button>
+        </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div id="step3" class="page">
+        <div class="progress-container"><div class="progress-bar" style="width: 45%;"></div></div>
+        <div class="step-title">⭐ Step 3: Preferred Solution<span class="step-desc">首選方案</span></div>
+        
+        <div class="option-card" onclick="selectOption(3, this, 'After discussion, we would prefer [首選方案 - Noun phrase] for several reasons. It is understood that [寫出一個壞處 - Complete sentence]. However, [寫出一個好處 - Complete sentence]. In addition, [寫出第二個好處 - Complete sentence].')">
+            After discussion, we would prefer <span class="blank-text">[首選方案 - Noun phrase]</span> for several reasons. It is understood that <span class="blank-text">[寫出一個壞處 - Complete sentence]</span>. However, <span class="blank-text">[寫出一個好處 - Complete sentence]</span>. In addition, <span class="blank-text">[寫出第二個好處 - Complete sentence]</span>.
+        </div>
+        <div class="option-card" onclick="selectOption(3, this, 'After careful discussion, we would prefer [首選方案 - Noun phrase] for a few key reasons. It is understood that [寫出一個壞處 - Complete sentence]. However, [寫出一個好處 - Complete sentence]. Moreover, [寫出第二個好處 - Complete sentence].')">
+            After careful discussion, we would prefer <span class="blank-text">[首選方案 - Noun phrase]</span> for a few key reasons. It is understood that <span class="blank-text">[寫出一個壞處 - Complete sentence]</span>. However, <span class="blank-text">[寫出一個好處 - Complete sentence]</span>. Moreover, <span class="blank-text">[寫出第二個好處 - Complete sentence]</span>.
+        </div>
+        <div class="option-card" onclick="selectOption(3, this, 'After thorough evaluation, we would prefer [首選方案 - Noun phrase]. We recognise that [寫出一個壞處 - Complete sentence], yet [寫出一個好處 - Complete sentence]. In addition, [寫出第二個好處 - Complete sentence].')">
+            After thorough evaluation, we would prefer <span class="blank-text">[首選方案 - Noun phrase]</span>. We recognise that <span class="blank-text">[寫出一個壞處 - Complete sentence]</span>, yet <span class="blank-text">[寫出一個好處 - Complete sentence]</span>. In addition, <span class="blank-text">[寫出第二個好處 - Complete sentence]</span>.
+        </div>
+
+        <div style="flex-grow: 1;"></div>
+        <div class="nav-buttons">
+            <button class="btn btn-outline" style="width: 35%;" onclick="goToStep(2)">⬅️ Back</button>
+            <button class="btn" id="btn-next-3" disabled onclick="goToStep(4)">Next ➡️</button>
+        </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div id="step4" class="page">
+        <div class="progress-container"><div class="progress-bar" style="width: 60%;"></div></div>
+        <div class="step-title">🛑 Step 4: Rejecting Others<span class="step-desc">否決方案</span></div>
+        
+        <div class="option-card" onclick="selectOption(4, this, 'The other two options would not be preferred because of their drawbacks. Although [方案一的對比句 - Complete sentence], [方案一的跟進壞處 - Complete sentence]. Regarding [方案二名稱 - Noun phrase], [方案二的壞處 - Complete sentence].')">
+            The other two options would not be preferred because of their drawbacks. Although <span class="blank-text">[方案一的對比句 - Complete sentence]</span>, <span class="blank-text">[方案一的跟進壞處 - Complete sentence]</span>. Regarding <span class="blank-text">[方案二名稱 - Noun phrase]</span>, <span class="blank-text">[方案二的壞處 - Complete sentence]</span>.
+        </div>
+        <div class="option-card" onclick="selectOption(4, this, 'The other two options appear to be less suitable. Although [方案一的對比句 - Complete sentence], [方案一的跟進壞處 - Complete sentence]. Regarding [方案二名稱 - Noun phrase], [方案二的壞處 - Complete sentence].')">
+            The other two options appear to be less suitable. Although <span class="blank-text">[方案一的對比句 - Complete sentence]</span>, <span class="blank-text">[方案一的跟進壞處 - Complete sentence]</span>. Regarding <span class="blank-text">[方案二名稱 - Noun phrase]</span>, <span class="blank-text">[方案二的壞處 - Complete sentence]</span>.
+        </div>
+        <div class="option-card" onclick="selectOption(4, this, 'The other two options are not recommended for implementation. Although [方案一的對比句 - Complete sentence], [方案一的跟進壞處 - Complete sentence]. Regarding [方案二名稱 - Noun phrase], [方案二的壞處 - Complete sentence].')">
+            The other two options are not recommended for implementation. Although <span class="blank-text">[方案一的對比句 - Complete sentence]</span>, <span class="blank-text">[方案一的跟進壞處 - Complete sentence]</span>. Regarding <span class="blank-text">[方案二名稱 - Noun phrase]</span>, <span class="blank-text">[方案二的壞處 - Complete sentence]</span>.
+        </div>
+
+        <div style="flex-grow: 1;"></div>
+        <div class="nav-buttons">
+            <button class="btn btn-outline" style="width: 35%;" onclick="goToStep(3)">⬅️ Back</button>
+            <button class="btn" id="btn-next-4" disabled onclick="goToStep(5)">Next ➡️</button>
+        </div>
+    </div>
+
+    <!-- Step 5 (Call to Action) -->
+    <div id="step5" class="page">
+        <div class="progress-container"><div class="progress-bar" style="width: 75%;"></div></div>
+        <div class="step-title">📢 Step 5: Call to Action<span class="step-desc">呼籲行動</span></div>
+        
+        <div class="option-card" onclick="selectOption(5, this, 'Considering the above, we suggest [建議的行動 - Verb-base] so as to [目的 - Verb-base]. It would be greatly appreciated if you could [禮貌要求對方確認/回覆 - Verb-base].')">
+            Considering the above, we suggest <span class="blank-text">[建議的行動 - Verb-base]</span> so as to <span class="blank-text">[目的 - Verb-base]</span>. It would be greatly appreciated if you could <span class="blank-text">[禮貌要求對方確認/回覆 - Verb-base]</span>.
+        </div>
+        <div class="option-card" onclick="selectOption(5, this, 'Taking the above points into account, we suggest [建議的行動 - Verb-base] in order to [目的 - Verb-base]. We would appreciate it if you could [禮貌要求對方確認/回覆 - Verb-base].')">
+            Taking the above points into account, we suggest <span class="blank-text">[建議的行動 - Verb-base]</span> in order to <span class="blank-text">[目的 - Verb-base]</span>. We would appreciate it if you could <span class="blank-text">[禮貌要求對方確認/回覆 - Verb-base]</span>.
+        </div>
+        <div class="option-card" onclick="selectOption(5, this, 'Based on the above considerations, we suggest [建議的行動 - Verb-base] to [目的 - Verb-base]. We would be grateful if you could [禮貌要求對方確認/回覆 - Verb-base].')">
+            Based on the above considerations, we suggest <span class="blank-text">[建議的行動 - Verb-base]</span> to <span class="blank-text">[目的 - Verb-base]</span>. We would be grateful if you could <span class="blank-text">[禮貌要求對方確認/回覆 - Verb-base]</span>.
+        </div>
+
+        <div style="flex-grow: 1;"></div>
+        <div class="nav-buttons">
+            <button class="btn btn-outline" style="width: 35%;" onclick="goToStep(4)">⬅️ Back</button>
+            <button class="btn" id="btn-next-5" disabled onclick="goToStep(6)">Next ➡️</button>
+        </div>
+    </div>
+
+    <!-- Step 6 (Leave-taking) -->
+    <div id="step6" class="page">
+        <div class="progress-container"><div class="progress-bar" style="width: 90%;"></div></div>
+        <div class="step-title">🤝 Step 6: Leave-taking<span class="step-desc">結尾敬語</span></div>
+        
+        <div class="option-card" onclick="selectOption(6, this, 'Thank you for your kind attention. Should you have any questions, please do not hesitate to contact me.')">
+            Thank you for your kind attention. Should you have any questions, please do not hesitate to contact me.
+        </div>
+        <div class="option-card" onclick="selectOption(6, this, 'Thank you for your attention. Please feel free to contact me if you need any clarification.')">
+            Thank you for your attention. Please feel free to contact me if you need any clarification.
+        </div>
+        <div class="option-card" onclick="selectOption(6, this, 'Thank you for your attention to this matter. Please let me know if any clarification is needed.')">
+            Thank you for your attention to this matter. Please let me know if any clarification is needed.
+        </div>
+
+        <div style="flex-grow: 1;"></div>
+        <div class="nav-buttons">
+            <button class="btn btn-outline" style="width: 35%;" onclick="goToStep(5)">⬅️ Back</button>
+            <button class="btn" id="btn-next-6" disabled onclick="generateResult()">Finish 🎉</button>
+        </div>
+    </div>
+
+    <!-- Final Result Page -->
+    <div id="result" class="page">
+        <div class="progress-container"><div class="progress-bar" style="width: 100%; background: #00CEC9;"></div></div>
+        <div class="step-title" style="color: var(--primary);">🎉 Your Template is Ready!</div>
+        
+        <div id="capture-area">
+            <div class="email-display" id="email-output"></div>
+        </div>
+        
+        <!-- 加入 Copy Text 掣方便學生抄字 -->
+        <button class="btn btn-outline" style="margin-bottom: 15px; width: 100%; font-size: 16px; padding: 12px;" onclick="copyText()">📋 Copy Text to Clipboard</button>
+        
+        <div class="nav-buttons" style="margin-top: 0; flex-wrap: wrap;">
+            <button class="btn btn-outline" style="flex: 1; min-width: 120px;" onclick="location.reload()">🔄 Restart</button>
+            <button class="btn" style="flex: 2; min-width: 200px; background: var(--secondary); color: var(--text-main);" onclick="downloadImage()">📸 Save as Image</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    let selections = {};
+
+    function goToStep(step) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        
+        if (step === 0) document.getElementById('landing').classList.add('active');
+        else if (step === 7) document.getElementById('result').classList.add('active');
+        else document.getElementById('step' + step).classList.add('active');
+    }
+
+    function selectOption(step, element, text) {
+        const cards = element.parentElement.querySelectorAll('.option-card');
+        cards.forEach(c => c.classList.remove('selected'));
+        
+        element.classList.add('selected');
+        selections[step] = text;
+        
+        document.getElementById('btn-next-' + step).disabled = false;
+    }
+
+    function generateResult() {
+        const fullEmail = `Dear [收件人/群組名稱 - e.g. Managers / Colleagues],\n\n${selections[1]}\n\n${selections[2]}\n\n${selections[3]}\n\n${selections[4]}\n\n${selections[5]}\n\n${selections[6]}\n\nBest regards,\n[你的名字 - Your Name]\n[你的職位 - Your Position]\n[你的部門 - Your Department]`;
+
+        const styledEmail = fullEmail.replace(/\[(.*?)\]/g, '<span class="blank-text">[$1]</span>');
+        
+        document.getElementById('email-output').innerHTML = styledEmail;
+        goToStep(7);
+    }
+
+    // 新增：複製純文字功能
+    function copyText() {
+        const emailContent = document.getElementById('email-output').innerText;
+        navigator.clipboard.writeText(emailContent).then(() => {
+            alert('✅ Text copied to clipboard! (已複製文字)');
+        }).catch(err => {
+            alert('Failed to copy text. Please select and copy manually.');
+        });
+    }
+
+    // 更新：改用 dom-to-image 來儲存圖片，更穩定解決報錯問題
+    function downloadImage() {
+        const captureElement = document.getElementById('capture-area');
+        
+        const btn = document.querySelector('button[onclick="downloadImage()"]');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = "⏳ Processing...";
+        btn.disabled = true;
+
+        domtoimage.toPng(captureElement, { bgcolor: '#ffffff' })
+            .then(function (dataUrl) {
+                const link = document.createElement('a');
+                link.download = 'ProWrite_Template.png';
+                link.href = dataUrl;
+                link.click();
+                
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            })
+            .catch(function (error) {
+                console.error('oops, something went wrong!', error);
+                alert("❌ Cannot save image. Try the 'Copy Text' button instead.");
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+    }
+</script>
+
+</body>
+</html>
