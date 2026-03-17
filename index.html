@@ -38,7 +38,6 @@
             width: 100%;
             max-width: 800px;
             background: var(--card-bg);
-            /* 移除 min-height: 85vh，改為自動適應內容高度，令 Desktop 排版緊湊 */
             min-height: auto;
             box-shadow: 0 15px 35px rgba(0,0,0,0.15);
             border-radius: 20px;
@@ -46,7 +45,7 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            margin: auto 0; /* 確保在 body 中垂直置中 */
+            margin: auto 0;
         }
 
         .page {
@@ -57,7 +56,6 @@
             flex-direction: column;
         }
         
-        /* Landing page 特別排版，讓內容更集中 */
         #landing {
             padding: 50px 40px;
             align-items: center;
@@ -66,7 +64,6 @@
 
         .page.active { display: flex; }
 
-        /* 手機版排版優化 */
         @media (max-width: 768px) {
             body { padding: 10px; }
             .app-container { min-height: 95vh; border-radius: 12px; margin: 0; }
@@ -120,7 +117,6 @@
         .progress-bar { height: 100%; background: linear-gradient(90deg, var(--secondary), var(--primary)); border-radius: 4px; transition: 0.4s ease; width: 0%; }
 
         .step-title { font-size: 22px; font-weight: 800; margin-bottom: 20px; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
-        .step-desc { font-size: 14px; color: var(--text-light); font-weight: 400; margin-left: auto; }
         
         .option-card { border: 2px solid #F1F2F6; background: #FFFFFF; border-radius: 12px; padding: 18px; padding-right: 45px; margin-bottom: 15px; cursor: pointer; transition: all 0.2s; position: relative; font-size: 15px; line-height: 1.6; color: #4A4A4A; }
         .option-card:hover { border-color: #A29BFE; background: #FDFDFF; }
@@ -129,10 +125,8 @@
         
         .blank-text { color: var(--blank-text); font-weight: 700; background: var(--blank-bg); padding: 1px 6px; border-radius: 4px; }
 
-        /* Email Display Normal Mode */
         .email-display { background: #FFFFFF; border: 2px solid #E9ECEF; padding: 25px; border-radius: 12px; white-space: pre-wrap; font-size: 15px; line-height: 1.7; margin-bottom: 20px; color: var(--text-main); transition: all 0.3s ease;}
         
-        /* 截圖專用 CSS Class */
         .capture-mode .email-display { padding: 15px !important; font-size: 12px !important; line-height: 1.4 !important; border: none !important; }
         .capture-mode #capture-area { padding: 0 !important; background: white; }
 
@@ -238,19 +232,19 @@
         </div>
     </div>
 
-    <!-- Step 4 -->
+    <!-- Step 4 (已更新清晰結構與 ✅❌) -->
     <div id="step4" class="page">
         <div class="progress-container"><div class="progress-bar" style="width: 60%;"></div></div>
         <div class="step-title">🛑 Step 4: Rejecting Others</div>
         
-        <div class="option-card" onclick="selectOption(4, this, 'The other two options would not be preferred because of their drawbacks. Although [方案一的對比句 - Complete sentence], [方案一的跟進壞處 - Complete sentence]. Regarding [方案二名稱 - Noun phrase], [方案二的壞處 - Complete sentence].')">
-            The other two options would not be preferred because of their drawbacks. Although <span class="blank-text">[方案一的對比句 - Complete sentence]</span>, <span class="blank-text">[方案一的跟進壞處 - Complete sentence]</span>. Regarding <span class="blank-text">[方案二名稱 - Noun phrase]</span>, <span class="blank-text">[方案二的壞處 - Complete sentence]</span>.
+        <div class="option-card" onclick="selectOption(4, this, 'The other two options would not be preferred because of their drawbacks. For [方案名稱 - Noun phrase], although ✅ [優點 - Complete sentence], ❌ [壞處 - Complete sentence]. Regarding [另一個方案名稱 - Noun phrase], ❌ [壞處 - Complete sentence].')">
+            The other two options would not be preferred because of their drawbacks. For <span class="blank-text">[方案名稱 - Noun phrase]</span>, although ✅ <span class="blank-text">[優點 - Complete sentence]</span>, ❌ <span class="blank-text">[壞處 - Complete sentence]</span>. Regarding <span class="blank-text">[另一個方案名稱 - Noun phrase]</span>, ❌ <span class="blank-text">[壞處 - Complete sentence]</span>.
         </div>
-        <div class="option-card" onclick="selectOption(4, this, 'The other two options appear to be less suitable. Although [方案一的對比句 - Complete sentence], [方案一的跟進壞處 - Complete sentence]. Regarding [方案二名稱 - Noun phrase], [方案二的壞處 - Complete sentence].')">
-            The other two options appear to be less suitable. Although <span class="blank-text">[方案一的對比句 - Complete sentence]</span>, <span class="blank-text">[方案一的跟進壞處 - Complete sentence]</span>. Regarding <span class="blank-text">[方案二名稱 - Noun phrase]</span>, <span class="blank-text">[方案二的壞處 - Complete sentence]</span>.
+        <div class="option-card" onclick="selectOption(4, this, 'The other two options would not be preferred due to their limitations. For [方案名稱 - Noun phrase], although ✅ [優點 - Complete sentence], ❌ [壞處 - Complete sentence]. As for [另一個方案名稱 - Noun phrase], ❌ [壞處 - Complete sentence].')">
+            The other two options would not be preferred due to their limitations. For <span class="blank-text">[方案名稱 - Noun phrase]</span>, although ✅ <span class="blank-text">[優點 - Complete sentence]</span>, ❌ <span class="blank-text">[壞處 - Complete sentence]</span>. As for <span class="blank-text">[另一個方案名稱 - Noun phrase]</span>, ❌ <span class="blank-text">[壞處 - Complete sentence]</span>.
         </div>
-        <div class="option-card" onclick="selectOption(4, this, 'The other two options are not recommended for implementation. Although [方案一的對比句 - Complete sentence], [方案一的跟進壞處 - Complete sentence]. Regarding [方案二名稱 - Noun phrase], [方案二的壞處 - Complete sentence].')">
-            The other two options are not recommended for implementation. Although <span class="blank-text">[方案一的對比句 - Complete sentence]</span>, <span class="blank-text">[方案一的跟進壞處 - Complete sentence]</span>. Regarding <span class="blank-text">[方案二名稱 - Noun phrase]</span>, <span class="blank-text">[方案二的壞處 - Complete sentence]</span>.
+        <div class="option-card" onclick="selectOption(4, this, 'The other two options are not recommended because of their potential problems. For [方案名稱 - Noun phrase], although ✅ [優點 - Complete sentence], ❌ [壞處 - Complete sentence]. Regarding [另一個方案名稱 - Noun phrase], ❌ [壞處 - Complete sentence].')">
+            The other two options are not recommended because of their potential problems. For <span class="blank-text">[方案名稱 - Noun phrase]</span>, although ✅ <span class="blank-text">[優點 - Complete sentence]</span>, ❌ <span class="blank-text">[壞處 - Complete sentence]</span>. Regarding <span class="blank-text">[另一個方案名稱 - Noun phrase]</span>, ❌ <span class="blank-text">[壞處 - Complete sentence]</span>.
         </div>
 
         <div class="nav-buttons">
